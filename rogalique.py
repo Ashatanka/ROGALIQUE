@@ -1,5 +1,19 @@
 import random
 
+def find_empty(map_grid, empty_symb):
+    foundempty = False
+    while (foundempty == False):
+        x = random.randint(0, len(map_grid)-1)
+        y = random.randint(0, len(map_grid[0])-1)
+        foundempty = (map_grid[x][y] == empty_symb)
+    return x, y
+
+def place_at_empty(subj, map_grid, num=1):
+    for _ in range(num):
+        x_empty, y_empty = find_empty(map_grid, ' ')
+        map_grid[x_empty][y_empty] = subj
+    return map_grid
+
 # Размеры карты
 map_width = 40
 map_height = 24
@@ -45,6 +59,14 @@ for _ in range(vertical_lines_number):
     col = random.randint(1, map_width)
     for row in map_grid:
         row[col-1] = ' '
+
+# генерация мечей и зелий
+# to do:
+# не должны оказаться друг в друге - в функцию подавать уже занятые места
+swords_num = 2
+poison_num = 10
+map_grid = place_at_empty('T', map_grid, swords_num)
+map_grid = place_at_empty('Q', map_grid, poison_num)
 
 # Вывод карты для проверки
 for row in map_grid:
