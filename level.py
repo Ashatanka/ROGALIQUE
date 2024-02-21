@@ -129,18 +129,26 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect(topleft = pos)
         self.pos = pos
+        self.hp = 10
 
     def move(self, dx, dy, level):
         new_pos = (self.pos[0] + dx * tilesize, self.pos[1] + dy * tilesize)
         if 0 <= new_pos[0] < map_width * tilesize and 0 <= new_pos[1] < map_height * tilesize:
+            
+            new_rect = pygame.Rect(new_pos[0], new_pos[1], self.rect.width, self.rect.height)
+            
             for tile in level.tiles:
-                if tile.tiletype == 'wall' and tile.rect.collidepoint(new_pos):
+                if tile.tiletype == 'wall' and tile.rect.colliderect(new_rect):
                     # Если есть стена на новой позиции, игрок не может сделать этот шаг
+                    return
+            for enemy in level.enemies:
+                if enemy.rect.colliderect(new_rect):
+                    self.hp -= 1
                     return
             
             # Если нет стены на пути, обновляем позицию игрока
             self.pos = new_pos
-            self.rect.topleft = self.pos
+            self.rect = new_rect
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos, size):
@@ -149,6 +157,7 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect(topleft = pos)
         self.pos = pos
+        self.hp = 10
 
     def move(self, dx, dy, level):
         new_pos = (self.pos[0] + dx * tilesize, self.pos[1] + dy * tilesize)
@@ -179,6 +188,7 @@ class Level:
     def __init__(self, map_grid, screen):
         self.display_surface = screen # экран как свойство уровня
         self.setup_level(map_grid) # при инициализации создаём плитки
+        self.font = pygame.font.Font(None, 36)  # Создаем объект шрифта для отображения текста
 
     def setup_level(self, map_grid):
         # уровень включает в себя плитки, игрока, предметы и врагов
@@ -208,6 +218,16 @@ class Level:
                     poison_sprite = Poison((x, y), tilesize)
                     self.items.add(poison_sprite)
 
+    def draw_health(self, player):
+        # Создаем текстовый объект, отображающий здоровье игрока
+        health_text = self.font.render(f'HP: {player.hp}', True, (255, 255, 255))
+        # Получаем прямоугольник, ограничивающий текстовый объект
+        text_rect = health_text.get_rect()
+        # Помещаем прямоугольник над игроком
+        text_rect.center = (player.rect.centerx, player.rect.centery - 20)
+        # Отображаем текстовый объект на экране
+        self.display_surface.blit(health_text, text_rect)
+
     # рисуем созданные плитки
     def draw_tiles(self):
         # level tiles
@@ -217,4 +237,5 @@ class Level:
         # player
         self.player.draw(self.display_surface)
         self.enemies.draw(self.display_surface)
-        self.items.draw(self.display_surface)         
+        self.items.draw(self.display_surface)
+        self.draw_health(self.player.sprite)         
