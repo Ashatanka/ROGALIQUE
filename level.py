@@ -71,38 +71,43 @@ def generate_level():
     return map_grid
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, pos, size):
+    def __init__(self, pos, size, cell):
         super().__init__()
-        self.image = pygame.Surface((size, size))
-        self.image.fill('grey')
+        #self.image = pygame.Surface((size, size))
+        #self.image.fill('grey')
+        if cell == empty_symb:
+            self.image = pygame.image.load('src\/tile-.png')
+        else:
+            self.image = pygame.image.load('src\/tile-W.png')
+        self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect(topleft = pos)
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, size):
         super().__init__()
-        self.image = pygame.Surface((size, size))
-        self.image.fill('green')
+        self.image = pygame.image.load('src\/tile-P.png')
+        self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect(topleft = pos)
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos, size):
         super().__init__()
-        self.image = pygame.Surface((size, size))
-        self.image.fill('red')
+        self.image = pygame.image.load('src\/tile-E.png')
+        self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect(topleft = pos)
 
 class Sword(pygame.sprite.Sprite):
     def __init__(self, pos, size):
         super().__init__()
-        self.image = pygame.Surface((size, size))
-        self.image.fill('white')
+        self.image = pygame.image.load('src\/tile-SW.png')
+        self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect(topleft = pos)
 
 class Poison(pygame.sprite.Sprite):
     def __init__(self, pos, size):
         super().__init__()
-        self.image = pygame.Surface((size, size))
-        self.image.fill('blue')
+        self.image = pygame.image.load('src\/tile-HP.png')
+        self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect(topleft = pos)
 class Level:
     def __init__(self, map_grid, screen):
@@ -122,8 +127,8 @@ class Level:
                 x = col_index * tilesize
                 y = row_index * tilesize
 
-                if cell == wall_symb:
-                    tile = Tile((x, y), tilesize)
+                if cell == wall_symb or cell == empty_symb:
+                    tile = Tile((x, y), tilesize, cell)
                     self.tiles.add(tile)
                 elif cell == hero_symb:
                     player_sprite = Player((x, y), tilesize)
@@ -134,6 +139,7 @@ class Level:
                 elif cell == poison_symb:
                     poison_sprite = Poison((x, y), tilesize)
                     self.items.add(poison_sprite)
+
 
     # рисуем созданные плитки
     def draw_tiles(self):

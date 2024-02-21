@@ -1,6 +1,6 @@
 # Общие настройки
 FPS = 30
-tilesize = 24
+tilesize = 40
 
 # Размеры карты
 map_width = 40
