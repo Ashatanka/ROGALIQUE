@@ -29,42 +29,35 @@ def room_generate(map_grid):
             room_height = map_height-room_y+1
         return room_x, room_y, room_width, room_height
 
+    def check_near(r_x, r_y, r_width, r_height, map_grid):
+        # note that r_x and r_y are from 0
+        if r_x != 0: # left
+            for i in range(r_y - (r_y != 0), r_y + r_height + (r_y + r_height != map_height)):
+                if map_grid[i][r_x-1] == empty_symb: return False
+        if r_x + r_width != map_width: # right
+            for i in range(r_y - (r_y != 0), r_y + r_height + (r_y + r_height != map_height)):
+                if map_grid[i][r_x + r_width] == empty_symb: return False
+        if r_y != 0: # up
+            for i in range(r_x, r_x+r_width):
+                if map_grid[r_y-1][i] == empty_symb: return False
+        if r_y + r_height != map_height:
+            for i in range(r_x, r_x+r_width):
+                if map_grid[r_y + r_height][i] == empty_symb: return False
+        return True
+
     def place_room(map):
-        cash = [row[:] for row in map]
+        # cash = [row[:] for row in map]
         r_x, r_y, r_width, r_height = room_settings()
         print("r_x, r_y, r_width, r_height = ", r_x, r_y, r_width, r_height)
+        if not check_near(r_x-1, r_y-1, r_width, r_height, map):
+            print("overlay bounds!")
+            return place_room(map)
         for height in range(r_height):
                 for width in range(r_width):
-                    if map[r_y+height-1][r_x+width-1] == empty_symb:
-                        print("overlay!")
-                        map = [i[:] for i in cash]
-                        for ind_row, row in enumerate(map):
-                            print(''.join(row), ind_row)
-                        return place_room(map)
-                    else:
-                        map[r_y+height-1][r_x+width-1] = empty_symb
+                    map[r_y+height-1][r_x+width-1] = empty_symb
         return map
 
     return place_room(map_grid)
-    '''# place room on map
-    cash = map_grid
-    no_overlay = True
-    r_x, r_y, r_width, r_height = room_settings()
-    print("r_x, r_y, r_width, r_height = ", r_x, r_y, r_width, r_height)
-    for height in range(r_height):
-            for width in range(r_width):
-                if map_grid[r_y+height-1][r_x+width-1] == empty_symb:
-                    no_overlay = False
-                    print("overlay!")
-                    break
-                else:
-                    map_grid[r_y+height-1][r_x+width-1] = empty_symb
-            print(no_overlay, "ok!")
-    if no_overlay:
-        return map_grid
-    else:
-        map_grid = cash
-        return room_generate(map_grid)'''
 
 def generate_level():
     # Создание карты, заполненной стенами
