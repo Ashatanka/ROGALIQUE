@@ -26,15 +26,15 @@ if __name__ == '__main__':
                     level.player.sprite.move(0, -1, level)  # Передвижение игрока вверх
                 elif event.key == pygame.K_DOWN:
                     level.player.sprite.move(0, 1, level)  # Передвижение игрока вниз
-
+                # Двигаем врагов после хода игрока
+                for enemy in level.enemies:
+                    enemy.move(level)
         # background
         screen.fill('black')
         # draw a level
         level.draw_tiles()
         pygame.display.update()
         screen.blit(level.player.sprite.image, level.player.sprite.rect)
-        for enemy in level.enemies:
-            enemy.move(level)
         clock.tick(FPS)  # set fps
 
 
