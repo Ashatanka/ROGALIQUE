@@ -33,6 +33,8 @@ if __name__ == '__main__':
         level.draw_tiles()
         pygame.display.update()
         screen.blit(level.player.sprite.image, level.player.sprite.rect)
+        for enemy in level.enemies:
+            enemy.move(level)
         clock.tick(FPS)  # set fps
 
 

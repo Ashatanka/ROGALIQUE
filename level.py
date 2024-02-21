@@ -159,17 +159,26 @@ class Enemy(pygame.sprite.Sprite):
         self.pos = pos
         self.hp = 10
 
-    def move(self, dx, dy, level):
+    def move(self, level):
+        variety = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        dx, dy = variety[random.randint(0, len(variety) - 1)]
         new_pos = (self.pos[0] + dx * tilesize, self.pos[1] + dy * tilesize)
         if 0 <= new_pos[0] < map_width * tilesize and 0 <= new_pos[1] < map_height * tilesize:
+            
+            new_rect = pygame.Rect(new_pos[0], new_pos[1], self.rect.width, self.rect.height)
+            
             for tile in level.tiles:
-                if tile.tiletype == 'wall' and tile.rect.collidepoint(new_pos):
+                if tile.tiletype == 'wall' and tile.rect.colliderect(new_rect):
                     # Если есть стена на новой позиции, игрок не может сделать этот шаг
+                    return
+            for player in level.player:
+                if player.rect.colliderect(new_rect):
+                    player.hp -= 1
                     return
             
             # Если нет стены на пути, обновляем позицию игрока
             self.pos = new_pos
-            self.rect.topleft = self.pos
+            self.rect = new_rect
 
 class Sword(pygame.sprite.Sprite):
     def __init__(self, pos, size):
