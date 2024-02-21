@@ -11,6 +11,7 @@ wall_symb = '#'
 sword_symb = 'T'
 poison_symb = 'Q'
 hero_symb = 'H'
+enemy_symb = 'E'
 
 # Комнаты
 room_minnum = 5
@@ -25,3 +26,4 @@ lines_maxnumber = 5
 # Сущности
 swords_num = 2
 poison_num = 10
+enemies_num = 10

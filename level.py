@@ -103,8 +103,9 @@ def generate_level():
     hero_x, hero_y = find_empty(map_grid, empty_symb)
     map_grid[hero_x][hero_y] = hero_symb
 
-    # субъекты класса противников
-    # ...
+    # противников
+    map_grid = place_at_empty(enemy_symb, map_grid, empty_symb, enemies_num)
+
     return map_grid
 
 class Tile(pygame.sprite.Sprite):
@@ -131,15 +132,15 @@ class Player(pygame.sprite.Sprite):
 
     def move(self, dx, dy, level):
         new_pos = (self.pos[0] + dx * tilesize, self.pos[1] + dy * tilesize)
-        
-        for tile in level.tiles:
-            if tile.tiletype == 'wall' and tile.rect.collidepoint(new_pos):
-                # Если есть стена на новой позиции, игрок не может сделать этот шаг
-                return
-        
-        # Если нет стены на пути, обновляем позицию игрока
-        self.pos = new_pos
-        self.rect.topleft = self.pos
+        if 0 <= new_pos[0] < map_width * tilesize and 0 <= new_pos[1] < map_height * tilesize:
+            for tile in level.tiles:
+                if tile.tiletype == 'wall' and tile.rect.collidepoint(new_pos):
+                    # Если есть стена на новой позиции, игрок не может сделать этот шаг
+                    return
+            
+            # Если нет стены на пути, обновляем позицию игрока
+            self.pos = new_pos
+            self.rect.topleft = self.pos
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos, size):
@@ -147,6 +148,19 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.image.load('src\/tile-E.png')
         self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect(topleft = pos)
+        self.pos = pos
+
+    def move(self, dx, dy, level):
+        new_pos = (self.pos[0] + dx * tilesize, self.pos[1] + dy * tilesize)
+        if 0 <= new_pos[0] < map_width * tilesize and 0 <= new_pos[1] < map_height * tilesize:
+            for tile in level.tiles:
+                if tile.tiletype == 'wall' and tile.rect.collidepoint(new_pos):
+                    # Если есть стена на новой позиции, игрок не может сделать этот шаг
+                    return
+            
+            # Если нет стены на пути, обновляем позицию игрока
+            self.pos = new_pos
+            self.rect.topleft = self.pos
 
 class Sword(pygame.sprite.Sprite):
     def __init__(self, pos, size):
@@ -184,6 +198,9 @@ class Level:
                 if cell == hero_symb:
                     player_sprite = Player((x, y), tilesize)
                     self.player.add(player_sprite)
+                elif cell == enemy_symb:
+                    enemy_sprite = Enemy((x, y), tilesize)
+                    self.enemies.add(enemy_sprite)
                 elif cell == sword_symb:
                     sword_sprite = Sword((x, y), tilesize)
                     self.items.add(sword_sprite)
@@ -199,5 +216,5 @@ class Level:
 
         # player
         self.player.draw(self.display_surface)
-
+        self.enemies.draw(self.display_surface)
         self.items.draw(self.display_surface)         

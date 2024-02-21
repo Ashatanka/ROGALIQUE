@@ -11,6 +11,7 @@ clock = pygame.time.Clock()  # to control frames per second
 # основной цикл игры
 if __name__ == '__main__':
     level = Level(generate_level(), screen)
+    
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
