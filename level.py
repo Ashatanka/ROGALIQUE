@@ -145,6 +145,14 @@ class Player(pygame.sprite.Sprite):
                 if enemy.rect.colliderect(new_rect):
                     self.hp -= 1
                     return
+                
+            for item in level.items:
+                if item.tiletype == 'poison' and item.rect.colliderect(new_rect):
+                    self.hp += 1
+                    item.kill()
+                elif item.tiletype == 'sword' and item.rect.colliderect(new_rect):
+                    # ....
+                    item.kill()
             
             # Если нет стены на пути, обновляем позицию игрока
             self.pos = new_pos
@@ -180,19 +188,19 @@ class Enemy(pygame.sprite.Sprite):
             self.pos = new_pos
             self.rect = new_rect
 
-class Sword(pygame.sprite.Sprite):
-    def __init__(self, pos, size):
+class Item(pygame.sprite.Sprite):
+    def __init__(self, pos, size, cell):
         super().__init__()
-        self.image = pygame.image.load('src\/tile-SW.png')
+        self.tiletype = 'other'
+        if cell == sword_symb:
+            self.image = pygame.image.load('src\/tile-SW.png')
+            self.tiletype = 'sword'
+        elif cell == poison_symb:
+            self.image = pygame.image.load('src\/tile-HP.png')
+            self.tiletype = 'poison'
         self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect(topleft = pos)
-
-class Poison(pygame.sprite.Sprite):
-    def __init__(self, pos, size):
-        super().__init__()
-        self.image = pygame.image.load('src\/tile-HP.png')
-        self.image = pygame.transform.scale(self.image, (size, size))
-        self.rect = self.image.get_rect(topleft = pos)
+        
 class Level:
     def __init__(self, map_grid, screen):
         self.display_surface = screen # экран как свойство уровня
@@ -221,10 +229,10 @@ class Level:
                     enemy_sprite = Enemy((x, y), tilesize)
                     self.enemies.add(enemy_sprite)
                 elif cell == sword_symb:
-                    sword_sprite = Sword((x, y), tilesize)
+                    sword_sprite = Item((x, y), tilesize, cell)
                     self.items.add(sword_sprite)
                 elif cell == poison_symb:
-                    poison_sprite = Poison((x, y), tilesize)
+                    poison_sprite = Item((x, y), tilesize, cell)
                     self.items.add(poison_sprite)
 
     def draw_health(self, player):
