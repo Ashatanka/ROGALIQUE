@@ -16,6 +16,56 @@ def place_at_empty(subj, map_grid, empty_symb, num=1):
         map_grid[x_empty][y_empty] = subj
     return map_grid
 
+def room_generate(map_grid):
+
+    def room_settings():
+        room_x = random.randint(1, map_width) # столбец
+        room_y = random.randint(1, map_height) # строка
+        room_width = random.randint(room_minsize, room_maxsize) #6
+        if ((map_width-room_x+1) < room_width):
+            room_width = map_width-room_x+1
+        room_height = random.randint(room_minsize, room_maxsize) #3
+        if ((map_height-room_y+1) < room_height):
+            room_height = map_height-room_y+1
+        return room_x, room_y, room_width, room_height
+
+    def place_room(map):
+        cash = [row[:] for row in map]
+        r_x, r_y, r_width, r_height = room_settings()
+        print("r_x, r_y, r_width, r_height = ", r_x, r_y, r_width, r_height)
+        for height in range(r_height):
+                for width in range(r_width):
+                    if map[r_y+height-1][r_x+width-1] == empty_symb:
+                        print("overlay!")
+                        map = [i[:] for i in cash]
+                        for ind_row, row in enumerate(map):
+                            print(''.join(row), ind_row)
+                        return place_room(map)
+                    else:
+                        map[r_y+height-1][r_x+width-1] = empty_symb
+        return map
+
+    return place_room(map_grid)
+    '''# place room on map
+    cash = map_grid
+    no_overlay = True
+    r_x, r_y, r_width, r_height = room_settings()
+    print("r_x, r_y, r_width, r_height = ", r_x, r_y, r_width, r_height)
+    for height in range(r_height):
+            for width in range(r_width):
+                if map_grid[r_y+height-1][r_x+width-1] == empty_symb:
+                    no_overlay = False
+                    print("overlay!")
+                    break
+                else:
+                    map_grid[r_y+height-1][r_x+width-1] = empty_symb
+            print(no_overlay, "ok!")
+    if no_overlay:
+        return map_grid
+    else:
+        map_grid = cash
+        return room_generate(map_grid)'''
+
 def generate_level():
     # Создание карты, заполненной стенами
     map_grid = [[wall_symb] * map_width for _ in range(map_height)]
@@ -25,19 +75,13 @@ def generate_level():
     print("rooms_number = ", rooms_number)
 
     for room in range(1, rooms_number+1):
-        room_x = random.randint(1, map_width)
-        room_y = random.randint(1, map_height)
-        room_width = random.randint(room_minsize, room_maxsize)
-        if ((map_width-room_x) < room_width):
-            room_width = map_width-room_x
-        room_height = random.randint(room_minsize, room_maxsize)
-        if ((map_height-room_y) < room_height):
-            room_height = map_height-room_y
-        
-        for height in range(room_height):
-            for width in range(room_width):
-                map_grid[room_y+height-1][room_x+width-1] = empty_symb
+        map_grid = room_generate(map_grid)
+        print('NEW ROOM')
+        for ind_row, row in enumerate(map_grid):
+            print(''.join(row), ind_row)
 
+    for row in map_grid:
+        print(''.join(row))
     # генерация линий
     # to do:
     # обеспечить доступность каждой комнаты

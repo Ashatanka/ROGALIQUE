@@ -17,6 +17,8 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            #elif event.type  == pygame.K_SPACE:
+            #    level = Level(generate_level(), screen)
         # background
         screen.fill('black')
         # draw a level
@@ -28,3 +30,13 @@ if __name__ == '__main__':
 # Вывод карты для проверки
 for row in map_grid:
     print(''.join(row))
+
+'''
+для каждой комнаты  есть  ли  строка, в которой все иксы?
+
+комнаты не пересек
+при генерации комнат хотя бы 1 символ уже пустота - перегенерация комнаты
+
+потом генерация  линий
+хотя бы 1 символ не пришлось заменять - 1 пересечение
+'''
