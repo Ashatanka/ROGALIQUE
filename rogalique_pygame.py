@@ -4,14 +4,11 @@ from level import *
 
 # Pygame setup
 pygame.init()
-tilesize = 24
+pygame.mixer.init() #звук
 screen = pygame.display.set_mode((map_width*tilesize, map_height*tilesize))
 clock = pygame.time.Clock()  # to control frames per second
 
-
-print("rooms_number = ", rooms_number)
-print("horiz = ", horizontal_lines_number)
-print("vert = ", vertical_lines_number)
+level = Level(generate_level(), screen)
 
 # основной цикл игры
 if __name__ == '__main__':
@@ -22,10 +19,11 @@ if __name__ == '__main__':
                 sys.exit()
         # background
         screen.fill('black')
-        # ... draw a level
+        # draw a level
+        level.draw_tiles()
 
         pygame.display.update()
-        clock.tick(60)  # set fps
+        clock.tick(FPS)  # set fps
 
 # Вывод карты для проверки
 for row in map_grid:

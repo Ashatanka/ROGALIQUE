@@ -1,6 +1,6 @@
-# Сущности
-swords_num = 2
-poison_num = 10
+# Общие настройки
+FPS = 30
+tilesize = 24
 
 # Размеры карты
 map_width = 40
@@ -21,3 +21,7 @@ room_maxsize = 8
 # Коридоры
 lines_minnumber = 3
 lines_maxnumber = 5
+
+# Сущности
+swords_num = 2
+poison_num = 10
