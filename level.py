@@ -16,7 +16,7 @@ def place_at_empty(subj, map_grid, empty_symb, num=1):
         map_grid[x_empty][y_empty] = subj
     return map_grid
 
-def room_generate(map_grid):
+def room_generate(map_grid, roomslist):
 
     def room_settings():
         room_x = random.randint(1, map_width) # столбец
@@ -45,19 +45,20 @@ def room_generate(map_grid):
                 if map_grid[r_y + r_height][i] == empty_symb: return False
         return True
 
-    def place_room(map):
+    def place_room(map, rooms):
         # cash = [row[:] for row in map]
         r_x, r_y, r_width, r_height = room_settings()
         print("r_x, r_y, r_width, r_height = ", r_x, r_y, r_width, r_height)
         if not check_near(r_x-1, r_y-1, r_width, r_height, map):
             print("overlay bounds!")
-            return place_room(map)
+            return place_room(map, rooms)
         for height in range(r_height):
                 for width in range(r_width):
                     map[r_y+height-1][r_x+width-1] = empty_symb
-        return map
+        #rooms.append({'r_x': r_x, 'r_y': r_y, 'r_width': r_width, 'r_height': r_height})
+        return map, rooms
 
-    return place_room(map_grid)
+    return place_room(map_grid, roomslist)
 
 def generate_level():
     # Создание карты, заполненной стенами
@@ -66,9 +67,9 @@ def generate_level():
     # Генерация комнат
     rooms_number = random.randint(room_minnum, room_maxnum)
     print("rooms_number = ", rooms_number)
-
+    roomslist = {}
     for room in range(1, rooms_number+1):
-        map_grid = room_generate(map_grid)
+        map_grid, roomslist = room_generate(map_grid, roomslist)
         print('NEW ROOM')
         for ind_row, row in enumerate(map_grid):
             print(''.join(row), ind_row)
@@ -225,7 +226,7 @@ class Level:
         self.items = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
 
-        # создаем  плитки согласно карте
+        # создаем плитки согласно карте
         for row_index, row in enumerate(map_grid):
             for col_index, cell in enumerate(row):
                 x = col_index * tilesize
