@@ -110,10 +110,12 @@ def generate_level():
 class Tile(pygame.sprite.Sprite):
     def __init__(self, pos, size, cell):
         super().__init__()
+        self.tiletype = 'other'
         #self.image = pygame.Surface((size, size))
         #self.image.fill('grey')
         if cell == wall_symb:
             self.image = pygame.image.load('src\/tile-W.png')
+            self.tiletype = 'wall'
         else:
             self.image = pygame.image.load('src\/tile-.png')
         self.image = pygame.transform.scale(self.image, (size, size))
@@ -127,8 +129,16 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = pos)
         self.pos = pos
 
-    def move(self, dx, dy):
-        self.pos = (self.pos[0] + dx * tilesize, self.pos[1] + dy * tilesize)
+    def move(self, dx, dy, level):
+        new_pos = (self.pos[0] + dx * tilesize, self.pos[1] + dy * tilesize)
+        
+        for tile in level.tiles:
+            if tile.tiletype == 'wall' and tile.rect.collidepoint(new_pos):
+                # Если есть стена на новой позиции, игрок не может сделать этот шаг
+                return
+        
+        # Если нет стены на пути, обновляем позицию игрока
+        self.pos = new_pos
         self.rect.topleft = self.pos
 
 class Enemy(pygame.sprite.Sprite):

@@ -18,13 +18,13 @@ if __name__ == '__main__':
                 sys.exit()
             elif event.type == pygame.KEYDOWN:  # Обработка нажатия клавиш
                 if event.key == pygame.K_LEFT:
-                    level.player.sprite.move(-1, 0)  # Передвижение игрока влево
+                    level.player.sprite.move(-1, 0, level)  # Передвижение игрока влево
                 elif event.key == pygame.K_RIGHT:
-                    level.player.sprite.move(1, 0)  # Передвижение игрока вправо
+                    level.player.sprite.move(1, 0, level)  # Передвижение игрока вправо
                 elif event.key == pygame.K_UP:
-                    level.player.sprite.move(0, -1)  # Передвижение игрока вверх
+                    level.player.sprite.move(0, -1, level)  # Передвижение игрока вверх
                 elif event.key == pygame.K_DOWN:
-                    level.player.sprite.move(0, 1)  # Передвижение игрока вниз    
+                    level.player.sprite.move(0, 1, level)  # Передвижение игрока вниз
 
         # background
         screen.fill('black')
