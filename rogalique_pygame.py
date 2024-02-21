@@ -26,6 +26,8 @@ if __name__ == '__main__':
                     level.player.sprite.move(0, -1, level)  # Передвижение игрока вверх
                 elif event.key == pygame.K_DOWN:
                     level.player.sprite.move(0, 1, level)  # Передвижение игрока вниз
+                elif event.key == pygame.K_SPACE:
+                    level.player.sprite.attack(level)
                 # Двигаем врагов после хода игрока
                 for enemy in level.enemies:
                     enemy.move(level)

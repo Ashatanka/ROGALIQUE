@@ -130,6 +130,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = pos)
         self.pos = pos
         self.hp = 10
+        self.strength = 1
 
     def move(self, dx, dy, level):
         new_pos = (self.pos[0] + dx * tilesize, self.pos[1] + dy * tilesize)
@@ -151,12 +152,22 @@ class Player(pygame.sprite.Sprite):
                     self.hp += 1
                     item.kill()
                 elif item.tiletype == 'sword' and item.rect.colliderect(new_rect):
-                    # ....
+                    self.strength += 1
                     item.kill()
             
             # Если нет стены на пути, обновляем позицию игрока
             self.pos = new_pos
             self.rect = new_rect
+        
+    def attack(self, level):
+        for enemy in level.enemies:
+            enemy_x, enemy_y = enemy.rect.topleft
+            if (enemy_x - self.pos[0] in [-tilesize, tilesize] and enemy_y == self.pos[1]) or \
+                        (enemy_y - self.pos[1] in [-tilesize, tilesize] and enemy_x == self.pos[0]):
+                enemy.hp -= self.strength
+                if enemy.hp <= 0:
+                    enemy.kill()
+        return
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos, size):
@@ -235,7 +246,16 @@ class Level:
                     poison_sprite = Item((x, y), tilesize, cell)
                     self.items.add(poison_sprite)
 
-    def draw_health(self, player):
+    def draw_health(self, player, enemies):
+        for enemy in self.enemies:
+            # Создаем текстовый объект, отображающий здоровье игрока
+            health_text = self.font.render(f'HP: {enemy.hp}', True, (255, 255, 255))
+            # Получаем прямоугольник, ограничивающий текстовый объект
+            text_rect = health_text.get_rect()
+            # Помещаем прямоугольник над игроком
+            text_rect.center = (enemy.rect.centerx, enemy.rect.centery - 20)
+            # Отображаем текстовый объект на экране
+            self.display_surface.blit(health_text, text_rect)
         # Создаем текстовый объект, отображающий здоровье игрока
         health_text = self.font.render(f'HP: {player.hp}', True, (255, 255, 255))
         # Получаем прямоугольник, ограничивающий текстовый объект
@@ -255,4 +275,4 @@ class Level:
         self.player.draw(self.display_surface)
         self.enemies.draw(self.display_surface)
         self.items.draw(self.display_surface)
-        self.draw_health(self.player.sprite)         
+        self.draw_health(self.player.sprite, self.enemies.sprites)         
