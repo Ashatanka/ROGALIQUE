@@ -112,10 +112,10 @@ class Tile(pygame.sprite.Sprite):
         super().__init__()
         #self.image = pygame.Surface((size, size))
         #self.image.fill('grey')
-        if cell == empty_symb:
-            self.image = pygame.image.load('src\/tile-.png')
-        else:
+        if cell == wall_symb:
             self.image = pygame.image.load('src\/tile-W.png')
+        else:
+            self.image = pygame.image.load('src\/tile-.png')
         self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect(topleft = pos)
 
@@ -125,6 +125,11 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.image.load('src\/tile-P.png')
         self.image = pygame.transform.scale(self.image, (size, size))
         self.rect = self.image.get_rect(topleft = pos)
+        self.pos = pos
+
+    def move(self, dx, dy):
+        self.pos = (self.pos[0] + dx * tilesize, self.pos[1] + dy * tilesize)
+        self.rect.topleft = self.pos
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos, size):
@@ -164,10 +169,9 @@ class Level:
                 x = col_index * tilesize
                 y = row_index * tilesize
 
-                if cell == wall_symb or cell == empty_symb:
-                    tile = Tile((x, y), tilesize, cell)
-                    self.tiles.add(tile)
-                elif cell == hero_symb:
+                tile = Tile((x, y), tilesize, cell)
+                self.tiles.add(tile)
+                if cell == hero_symb:
                     player_sprite = Player((x, y), tilesize)
                     self.player.add(player_sprite)
                 elif cell == sword_symb:
@@ -176,7 +180,6 @@ class Level:
                 elif cell == poison_symb:
                     poison_sprite = Poison((x, y), tilesize)
                     self.items.add(poison_sprite)
-
 
     # рисуем созданные плитки
     def draw_tiles(self):
