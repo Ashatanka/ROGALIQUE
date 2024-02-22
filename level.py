@@ -99,11 +99,26 @@ def generate_level():
                 print("line y ", line_y)
                 map_grid[line_y] = [empty_symb]*map_width
                 horizontal_lines_number -= 1
-            else:
+            elif vertical_lines_number != 0:
                 line_x = random.randint(room_settings["r_x"], room_settings["r_x"] + room_settings["r_width"] - 2)
                 print("line x ", line_x)
                 for row in map_grid:
                     row[line_x] = empty_symb
+                vertical_lines_number -= 1
+    
+    while horizontal_lines_number != 0:
+        line_y = random.randint(0, map_height-1)
+        print("line y ", line_y)
+        map_grid[line_y] = [empty_symb]*map_width
+        horizontal_lines_number -= 1
+
+    while vertical_lines_number != 0:
+        line_x = random.randint(0, map_width-1)
+        print("line x ", line_x)
+        for row in map_grid:
+            row[line_x] = empty_symb
+        vertical_lines_number -= 1
+            
 
     # генерация мечей и зелий
     # to do:
