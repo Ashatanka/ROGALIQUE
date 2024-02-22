@@ -1,6 +1,6 @@
 from settings import *
 import random
-import pygame
+import pygame, sys
 import tkinter as tk
 
 def find_empty(map_grid, empty_symb):
