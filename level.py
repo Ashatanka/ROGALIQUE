@@ -16,20 +16,7 @@ def place_at_empty(subj, map_grid, empty_symb, num=1):
         map_grid[x_empty][y_empty] = subj
     return map_grid
 
-def room_generate(map_grid, roomslist):
-
-    def room_settings():
-        room_x = random.randint(1, map_width) # столбец
-        room_y = random.randint(1, map_height) # строка
-        room_width = random.randint(room_minsize, room_maxsize) #6
-        if ((map_width-room_x+1) < room_width):
-            room_width = map_width-room_x+1
-        room_height = random.randint(room_minsize, room_maxsize) #3
-        if ((map_height-room_y+1) < room_height):
-            room_height = map_height-room_y+1
-        return room_x, room_y, room_width, room_height
-
-    def check_near(r_x, r_y, r_width, r_height, map_grid):
+def check_near(r_x, r_y, r_width, r_height, map_grid):
         # note that r_x and r_y are from 0
         if r_x != 0: # left
             for i in range(r_y - (r_y != 0), r_y + r_height + (r_y + r_height != map_height)):
@@ -45,17 +32,30 @@ def room_generate(map_grid, roomslist):
                 if map_grid[r_y + r_height][i] == empty_symb: return False
         return True
 
+def room_generate(map_grid, roomslist):
+
+    def room_settings():
+        room_x = random.randint(0, map_width-1) # столбец
+        room_y = random.randint(0, map_height-1) # строка
+        room_width = random.randint(room_minsize, room_maxsize) #6
+        if ((map_width-room_x) < room_width):
+            room_width = map_width-room_x
+        room_height = random.randint(room_minsize, room_maxsize) #3
+        if ((map_height-room_y) < room_height):
+            room_height = map_height-room_y
+        return room_x, room_y, room_width, room_height
+
     def place_room(map, rooms):
         # cash = [row[:] for row in map]
         r_x, r_y, r_width, r_height = room_settings()
         print("r_x, r_y, r_width, r_height = ", r_x, r_y, r_width, r_height)
-        if not check_near(r_x-1, r_y-1, r_width, r_height, map):
+        if not check_near(r_x, r_y, r_width, r_height, map):
             print("overlay bounds!")
             return place_room(map, rooms)
         for height in range(r_height):
                 for width in range(r_width):
-                    map[r_y+height-1][r_x+width-1] = empty_symb
-        #rooms.append({'r_x': r_x, 'r_y': r_y, 'r_width': r_width, 'r_height': r_height})
+                    map[r_y+height][r_x+width] = empty_symb
+        rooms.append({'r_x': r_x, 'r_y': r_y, 'r_width': r_width, 'r_height': r_height})
         return map, rooms
 
     return place_room(map_grid, roomslist)
@@ -67,7 +67,7 @@ def generate_level():
     # Генерация комнат
     rooms_number = random.randint(room_minnum, room_maxnum)
     print("rooms_number = ", rooms_number)
-    roomslist = {}
+    roomslist = []
     for room in range(1, rooms_number+1):
         map_grid, roomslist = room_generate(map_grid, roomslist)
         print('NEW ROOM')
@@ -86,13 +86,24 @@ def generate_level():
     print("horiz = ", horizontal_lines_number)
     print("vert = ", vertical_lines_number)
 
-    for _ in range(horizontal_lines_number):
-        map_grid[random.randint(1, map_height)-1] = [empty_symb]*map_width
-
-    for _ in range(vertical_lines_number):
-        col = random.randint(1, map_width)
-        for row in map_grid:
-            row[col-1] = empty_symb
+    r = roomslist[0]
+    print(*r.values())
+    for i in range(rooms_number):
+        trash = check_near(*(roomslist[i].values()), map_grid)
+        print("no overlay = ", trash)
+        if trash:
+            room_settings = roomslist[i]
+            print("room ", room_settings["r_y"], room_settings["r_x"])
+            if horizontal_lines_number != 0:
+                line_y = random.randint(room_settings["r_y"], room_settings["r_y"] + room_settings["r_height"] - 2)
+                print("line y ", line_y)
+                map_grid[line_y] = [empty_symb]*map_width
+                horizontal_lines_number -= 1
+            else:
+                line_x = random.randint(room_settings["r_x"], room_settings["r_x"] + room_settings["r_width"] - 2)
+                print("line x ", line_x)
+                for row in map_grid:
+                    row[line_x] = empty_symb
 
     # генерация мечей и зелий
     # to do:
