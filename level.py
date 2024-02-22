@@ -1,6 +1,7 @@
 from settings import *
 import random
 import pygame
+import tkinter as tk
 
 def find_empty(map_grid, empty_symb):
     foundempty = False
@@ -48,9 +49,7 @@ def room_generate(map_grid, roomslist):
     def place_room(map, rooms):
         # cash = [row[:] for row in map]
         r_x, r_y, r_width, r_height = room_settings()
-        print("r_x, r_y, r_width, r_height = ", r_x, r_y, r_width, r_height)
         if not check_near(r_x, r_y, r_width, r_height, map):
-            print("overlay bounds!")
             return place_room(map, rooms)
         for height in range(r_height):
                 for width in range(r_width):
@@ -66,16 +65,10 @@ def generate_level():
 
     # Генерация комнат
     rooms_number = random.randint(room_minnum, room_maxnum)
-    print("rooms_number = ", rooms_number)
     roomslist = []
     for room in range(1, rooms_number+1):
         map_grid, roomslist = room_generate(map_grid, roomslist)
-        print('NEW ROOM')
-        for ind_row, row in enumerate(map_grid):
-            print(''.join(row), ind_row)
 
-    for row in map_grid:
-        print(''.join(row))
     # генерация линий
     # to do:
     # обеспечить доступность каждой комнаты
@@ -83,38 +76,26 @@ def generate_level():
     # линии не должны быть рядом (ширина прохода 1 блок)
     horizontal_lines_number = random.randint(lines_minnumber, lines_maxnumber)
     vertical_lines_number = random.randint(lines_minnumber, lines_maxnumber)
-    print("horiz = ", horizontal_lines_number)
-    print("vert = ", vertical_lines_number)
 
-    r = roomslist[0]
-    print(*r.values())
     for i in range(rooms_number):
-        trash = check_near(*(roomslist[i].values()), map_grid)
-        print("no overlay = ", trash)
-        if trash:
-            room_settings = roomslist[i]
-            print("room ", room_settings["r_y"], room_settings["r_x"])
+        if check_near(*(roomslist[i].values()), map_grid):
             if horizontal_lines_number != 0:
-                line_y = random.randint(room_settings["r_y"], room_settings["r_y"] + room_settings["r_height"] - 2)
-                print("line y ", line_y)
+                line_y = random.randint(roomslist[i]["r_y"], roomslist[i]["r_y"] + roomslist[i]["r_height"] - 1)
                 map_grid[line_y] = [empty_symb]*map_width
                 horizontal_lines_number -= 1
             elif vertical_lines_number != 0:
-                line_x = random.randint(room_settings["r_x"], room_settings["r_x"] + room_settings["r_width"] - 2)
-                print("line x ", line_x)
+                line_x = random.randint(roomslist[i]["r_x"], roomslist[i]["r_x"] + roomslist[i]["r_width"] - 1)
                 for row in map_grid:
                     row[line_x] = empty_symb
                 vertical_lines_number -= 1
     
     while horizontal_lines_number != 0:
         line_y = random.randint(0, map_height-1)
-        print("line y ", line_y)
         map_grid[line_y] = [empty_symb]*map_width
         horizontal_lines_number -= 1
 
     while vertical_lines_number != 0:
         line_x = random.randint(0, map_width-1)
-        print("line x ", line_x)
         for row in map_grid:
             row[line_x] = empty_symb
         vertical_lines_number -= 1
@@ -303,3 +284,28 @@ class Level:
         self.enemies.draw(self.display_surface)
         self.items.draw(self.display_surface)
         self.draw_health(self.player.sprite, self.enemies.sprites)         
+
+    def game_over(self):
+        # Создаем окно
+        game_over_window = tk.Tk()
+        game_over_window.title("Game Over")
+
+        # Создаем текстовое сообщение
+        label = tk.Label(game_over_window, text="Game Over", font=("Helvetica", 24))
+        label.pack(pady=20)
+
+        def play_again():
+            game_over_window.destroy()  # Закрываем окно
+        
+        def close():
+            game_over_window.destroy()  # Закрываем окно
+            pygame.quit()  # Завершаем Pygame
+            sys.exit()  # Завершаем программу
+
+        # Создаем кнопки
+        button_play_again = tk.Button(game_over_window, text="Играть ещё", command=play_again)
+        button_play_again.pack(side=tk.LEFT, padx=10)
+        button_close = tk.Button(game_over_window, text="Закрыть", command=close)
+        button_close.pack(side=tk.RIGHT, padx=10)
+
+        game_over_window.mainloop()  # Запускаем главный цикл tkinter
